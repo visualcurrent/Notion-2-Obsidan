@@ -6,7 +6,7 @@ For those considering switching from [Notion](https://www.notion.so/) to [Obsidi
 3. Repackages all the files in a new zip archive.
 4. Which can then be extracted and opened as an Obsidian vault
 
-The writup below describes the full sequence of modifications needed to make your Notion export compatible with Obsidian.
+The writeup below describes the full sequence of modifications needed to make your Notion export compatible with Obsidian.
 
 Out of the box, the export files that Notion provides do not migrate to Obsidian well. The hierarchical structure is preserved and all your work can be navigated and viewed using Obsidian’s file explorer. Any of your external links will be available. However, none of the internal navigation links will work, which also means there won’t be any backlinks, which is one of the great features of Obsidian. Embedded images also won’t show.
 
