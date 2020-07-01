@@ -216,3 +216,11 @@ Nice work\! You’re finished. Time to import everything into Obsidian
 4.  > Use the Select Folder window to navigate to the directory with your newly converted files
 
 5.  > Enjoy the shift to Obsidian\!
+
+# Donation Links
+If the instructions or code have been useful to you, please consider the time you've saved and treat me to half a lunch or so :)
+Here are some donation links for me:
+* PayPal: https://www.paypal.me/GabrielKrause
+* Venmo: @Gabriel-Krause
+* Etherium: 0xeAE10E05427845aE816E61605eCC779A2d5e59A4
+
