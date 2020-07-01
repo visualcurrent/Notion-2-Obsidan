@@ -1,7 +1,12 @@
 # Notion-2-Obsidan
-Conversion routines to convert all Notion .md exports to full Obsidian compatibility
 
-For those considering switching from [<span class="underline">Notion</span>](https://www.notion.so/) to [<span class="underline">Obsidian</span>](https://obsidian.md/), here is a full sequence of modifications to make your Notion export compatible with Obsidian.
+For those considering switching from [Notion](https://www.notion.so/) to [Obsidian](https://obsidian.md/), here is a Python script converts your Notion export into an Obsidian friendly format. Specifically:
+1. Asks for your Notion-Export.zip file
+2. Finds all internal links and converts them to an Obsidian friendly markdown
+3. Repackages all the files in a new zip archive.
+4. Which can then be extracted and opened as an Obsidian vault
+
+The writup below describes the full sequence of modifications needed to make your Notion export compatible with Obsidian.
 
 Out of the box, the export files that Notion provides do not migrate to Obsidian well. The hierarchical structure is preserved and all your work can be navigated and viewed using Obsidian’s file explorer. Any of your external links will be available. However, none of the internal navigation links will work, which also means there won’t be any backlinks, which is one of the great features of Obsidian. Embedded images also won’t show.
 
@@ -10,18 +15,6 @@ I’m using the Windows OS. Other OS users will want to substitute the tools sug
 Note that Notion comments do NOT appear to be included in their export files.
 
 Outside of missing comments. This guide will give you full internal link and backlink integration for your content in Obsidian.
-
-# Supporting the Work
-
-I’m happy to offer you the complete process for your content migration to Obsidian. I’ve been diligent in documenting all the needed steps and they should save you considerable time and frustration.
-
-Should you want to save even more time, I have wrapped this process into a small program that will convert all of your links and files to Obsidian in a matter of seconds. For a sliding scale donation starting at $4 USD, you can have the full conversion tool.
-
-I estimate that anyone using this guide can convert their Notion export in a day or less of work. Without this free guide, it would likely take several days of troubleshooting. If you’re a confident programmer, it may take a couple hours with this guide. I encourage everyone to go through the process. It is rather satisfying.
-
-However, if your time is worth more spent elsewhere, consider what the time savings is worth to you. My hole-in-the-bucket COVID-19 era income will greatly appreciate the help. Donation links are at the end of this documentation.
-
-Otherwise, let’s get started\! Here are the steps...
 
 # Export Your Full Notion Database
 
@@ -217,3 +210,6 @@ Nice work\! You’re finished. Time to import everything into Obsidian
 
 5.  > Enjoy the shift to Obsidian\!
 
+# Supporting the Work
+
+I’m happy to offer you working code and the conversion methodology for your content migration to Obsidian. If you're able and inclined, a donation for the convenience and time savings would be genuinely appreciated.
