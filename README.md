@@ -1,6 +1,6 @@
 # Notion-2-Obsidan
 
-For those considering switching from [Notion](https://www.notion.so/) to [Obsidian](https://obsidian.md/), here is a Python script converts your Notion export into an Obsidian friendly format. Specifically:
+For those considering switching from [Notion](https://www.notion.so/) to [Obsidian](https://obsidian.md/), here is a Python script that converts your Notion export into an Obsidian friendly format. Specifically:
 1. Asks for your Notion-Export.zip file
 2. Finds all internal links and converts them to an Obsidian friendly markdown
 3. Repackages all the files in a new zip archive.
@@ -18,18 +18,18 @@ Outside of missing comments. This guide will give you full internal link and bac
 
 # Export Your Full Notion Database
 
-1.  > From your Notion app, click the **Settings & Members** tab in the sidebar  
+1.  From your Notion app, click the **Settings & Members** tab in the sidebar  
     > ![](media/image2.png)
 
-2.  > Find and click the **Settings** tab. Find the **Export content** section. Click the **Export all workspace content** button  
+2.  Find and click the **Settings** tab. Find the **Export content** section. Click the **Export all workspace content** button  
     > ![](media/image1.png)
 
-3.  > Select **Markdown & CSV** as Export Format and click the **Export** button  
+3.  Select **Markdown & CSV** as Export Format and click the **Export** button  
     > ![](media/image4.png)
 
-4.  > Save the resulting .zip file to your computer
+4.  Save the resulting .zip file to your computer
 
-5.  > Extract the .zip contents to a known location
+5.  Extract the .zip contents to a known location
 
 # Remove the UID from all files and folders
 
@@ -74,22 +74,22 @@ We’re primarily interested in the note filename so that we can build complete 
 
 Process Link Names:
 
-1.  > Isolate and save the {URL} portion
+1.  Isolate and save the {URL} portion
 
-2.  > Isolate and save the {Link Name} portion
+2.  Isolate and save the {Link Name} portion
 
-3.  > Isolate the {Note Name} portion to make it Obsidian friendly
+3.  Isolate the {Note Name} portion to make it Obsidian friendly
 
-4.  > Search and replace any symbols in the {Note Name} to a space. (Only alphanumerics, underscores, and spaces are retained in Notion exported filenames)
+4.  Search and replace any symbols in the {Note Name} to a space. (Only alphanumerics, underscores, and spaces are retained in Notion exported filenames)
 
-5.  > Remove any duplicate spaces and leading/trailing spaces from the {Note Name}
+5.  Remove any duplicate spaces and leading/trailing spaces from the {Note Name}
 
-6.  > Reconstruct Internal Links as pretty links with the source URL as a footnote
+6.  Reconstruct Internal Links as pretty links with the source URL as a footnote
     
-    1.  > If {Link Name} is the same as {Note Name}  
+    1.  If {Link Name} is the same as {Note Name}  
         > \[\[Note Name\]\] ^\[URL\]
     
-    2.  > If {Link Name} is different than {Note Name}  
+    2.  If {Link Name} is different than {Note Name}  
         > \[\[Note Name|Link Name\]\] ^\[URL\]
 
 ### Structural Links
@@ -112,15 +112,15 @@ We want to preserve the relative path structure that these links contain. This h
 
 Process the relative paths in each line, in this order:
 
-1.  > Remove the UIDs and the single leading URL space encoding (%20) in front of the UIDs
+1.  Remove the UIDs and the single leading URL space encoding (%20) in front of the UIDs
 
-2.  > Remove the file extension (.md or .csv)
+2.  Remove the file extension (.md or .csv)
 
-3.  > Search and replace the all remaining URL space encoding characters (%20) with a normal space character
+3.  Search and replace the all remaining URL space encoding characters (%20) with a normal space character
 
-4.  > Remove parentheses
+4.  Remove parentheses
 
-5.  > Restructure the links into Obsidian Pretty Link format  
+5.  Restructure the links into Obsidian Pretty Link format  
     > \[\[Relative/Path/filename|Note Title\]\]  
     > \[\[Bodywork/Micronutrient Smoothie|Micronutrient Smoothie\]\]
 
@@ -133,15 +133,15 @@ There may be broken links within Notion. Often a broken link in Notion still has
 
 Process the broken links:
 
-1.  > Remove the URL section in parentheses
+1.  Remove the URL section in parentheses
 
-2.  > Only alphanumerics, underscores, and spaces are retained in Notion exported filenames. Convert all other symbols to a space
+2.  Only alphanumerics, underscores, and spaces are retained in Notion exported filenames. Convert all other symbols to a space
 
-3.  > Replace duplicate spaces with a single space
+3.  Replace duplicate spaces with a single space
 
-4.  > Remove any leading or trailing spaces
+4.  Remove any leading or trailing spaces
 
-5.  > Frame the modified title in Obsidian double square brackets
+5.  Frame the modified title in Obsidian double square brackets
 
 > \[\[Evaluate on Tuesday\]\]  
 > \[\[2017 1 15 19 14\]\]
@@ -156,9 +156,9 @@ Any words that follow will be separated with a comma.
 
 Each of these words should be converted to the Obsidian tag format.
 
-1.  > Find all words after “Tags :”
+1.  Find all words after “Tags :”
 
-2.  > Prefix each of them with a hash “\#”
+2.  Prefix each of them with a hash “\#”
 
 > Tags: \#Routine, \#Structure
 
@@ -174,17 +174,17 @@ Beyond the first Internal Link column, all the data in the following columns exi
 
 Search and replace to modify the Internal Links in this order:
 
-1.  > If there's a web link in the title, and the link includes URL identifier (http, https, ftp). It must be removed because Notion exports these pages without the URL identifier in the filename.
+1.  If there's a web link in the title, and the link includes URL identifier (http, https, ftp). It must be removed because Notion exports these pages without the URL identifier in the filename.
 
-2.  > Only alphanumerics, underscores, and spaces are retained in Notion exported filenames. All other symbols need to be converted to a space.
+2.  Only alphanumerics, underscores, and spaces are retained in Notion exported filenames. All other symbols need to be converted to a space.
 
-3.  > Replace duplicate spaces with a single space.
+3.  Replace duplicate spaces with a single space.
 
-4.  > Remove any leading spaces
+4.  Remove any leading spaces
 
-5.  > Notion cuts all filenames to a maximum of 50 characters. So cut the title to 50 characters if it’s longer.
+5.  Notion cuts all filenames to a maximum of 50 characters. So cut the title to 50 characters if it’s longer.
 
-6.  > Finally, remove any trailing spaces.
+6.  Finally, remove any trailing spaces.
 
 Now that all the Internal Links match their respective file names, wrap each one in double square brackets to be an Obsidian Internal Link.
 
@@ -199,16 +199,16 @@ Once the Internal Links have been converted in a Notion CSV file, change the fil
 
 Nice work\! You’re finished. Time to import everything into Obsidian
 
-1.  > Place all the converted files into a directory of your choosing
+1.  Place all the converted files into a directory of your choosing
 
-2.  > Open Obsidian and click the Vault Icon ![](media/image3.png)
+2.  Open Obsidian and click the Vault Icon ![](media/image3.png)
 
-3.  > Select **Open folder as vault**  
+3.  Select **Open folder as vault**  
     > ![](media/image5.png)
 
-4.  > Use the Select Folder window to navigate to the directory with your newly converted files
+4.  Use the Select Folder window to navigate to the directory with your newly converted files
 
-5.  > Enjoy the shift to Obsidian\!
+5.  Enjoy the shift to Obsidian\!
 
 # Supporting the Work
 
