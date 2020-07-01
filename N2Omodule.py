@@ -5,10 +5,10 @@ Created on Thu Jun 25 14:16:18 2020
 @author: books
 """
 
-import io
-import os
-import re
-import csv
+from io import TextIOWrapper
+from os import path
+from re import sub, search
+from csv import DictReader
 from pathlib import Path
 
 
@@ -29,7 +29,7 @@ def ObsIndex(contents):
             folderTree.append(line[1])
     ## Case: directories are implicit
     if not folderIndex:
-        Tree = list(set([os.path.dirname(x) for x in contents]))
+        Tree = list(set([path.dirname(x) for x in contents]))
         [folderTree.append(Path(l)) for l in Tree]
 
     
@@ -60,7 +60,7 @@ def ObsIndex(contents):
 def N2Ocsv(csvFile):
     
     # Convert csv to dictionary object
-    reader = csv.DictReader(io.TextIOWrapper(csvFile, "utf-8-sig"), delimiter=',', quotechar='"')
+    reader = DictReader(TextIOWrapper(csvFile, "utf-8-sig"), delimiter=',', quotechar='"')
    
     dictionry = {}
     for row in reader: # I don't know how this works but it does what I want
@@ -80,10 +80,10 @@ def N2Ocsv(csvFile):
     for line in oldTitle:
         line = line.rstrip()
         #1 Replace URL identifiers and/or symbols with a space
-        line = re.sub(regexURLid," ",line)
-        line = re.sub(regexSymbols," ",line)
+        line = sub(regexURLid," ",line)
+        line = sub(regexSymbols," ",line)
          #2 Remove duplicate spaces
-        line = re.sub(regexSpaces, " ", line)        
+        line = sub(regexSpaces, " ", line)        
         #3 Remove any spaces at beginning
         line = line.lstrip()
         #4 Cut title at 50 characters
@@ -112,10 +112,10 @@ def convertInternalLink(matchObj):
     # print("Groups :",match.groups())
     
     # Replace symbols with space
-    urlTitle = re.sub(regexSymbols," ",urlTitle)
+    urlTitle = sub(regexSymbols," ",urlTitle)
     
     # Remove duplicate spaces
-    urlTitle = re.sub(regexSpaces," ",urlTitle)
+    urlTitle = sub(regexSpaces," ",urlTitle)
 
     # Cut title at 50 characters
     urlTitle = urlTitle[0:50]
@@ -141,10 +141,10 @@ def convertBlankLink(matchObj):
     InternalTitle = matchObj.group(1)
     
     # Replace symbols with space
-    InternalLink = re.sub(regexSymbols," ",InternalTitle)
+    InternalLink = sub(regexSymbols," ",InternalTitle)
     
     # Remove duplicate spaces
-    InternalLink = re.sub(regexSpaces, " ", InternalLink)
+    InternalLink = sub(regexSpaces, " ", InternalLink)
     
     # Remove any spaces at beginning
     InternalLink = InternalLink.lstrip()
@@ -182,16 +182,16 @@ def N2Omd(mdFile):
         regexSlash =    "\s\/"
         
         # Identify and group relative paths
-        pathMatch = re.search(regexPath,line)
+        pathMatch = search(regexPath,line)
         # modify paths into local links. just remove UID and convert spaces
         if pathMatch:
             Title = pathMatch.group(1)
             relativePath = pathMatch.group(2)
             # Clean UID
-            relativePath = re.sub(regexUID," ",relativePath)
+            relativePath = sub(regexUID," ",relativePath)
             # correct spaces
-            relativePath = re.sub(regex20," ",relativePath)
-            relativePath = re.sub(regexSlash,"/",relativePath).strip()
+            relativePath = sub(regex20," ",relativePath)
+            relativePath = sub(regexSlash,"/",relativePath).strip()
             
             # Reconstruct Links as pretty links
             PrettyLink = "[["+relativePath+"|"+Title+"]] "
@@ -209,10 +209,10 @@ def N2Omd(mdFile):
         ## Group3: target file name (in web form but not in exported form without symbols) 
         regexInternalLink = "\[(.[^\[\]\(\)]*)\]\((https:\/\/www.notion.so\/(?:.[^\/]*)\/(.[^\[\]\(\)]*)-.[^\[\]\(\)]*)\)"
         
-        match = re.search(regexInternalLink,line)
+        match = search(regexInternalLink,line)
         # Substitute regex find with PrettyLink
         if match:
-            line = re.sub(regexInternalLink, convertInternalLink, line)       
+            line = sub(regexInternalLink, convertInternalLink, line)       
 
         
         
@@ -222,9 +222,9 @@ def N2Omd(mdFile):
         ## Group1:Pretty Link Title
         regexBlankLink = "\[(.[^\[\]\(\)]*)\]\(about:blank#.[^\[\]\(\)]*\)"
         
-        matchBlank = re.search(regexBlankLink,line) 
+        matchBlank = search(regexBlankLink,line) 
         if matchBlank:
-            line = re.sub(regexBlankLink, convertBlankLink, line)
+            line = sub(regexBlankLink, convertBlankLink, line)
         
         
 
@@ -236,19 +236,19 @@ def N2Omd(mdFile):
         regex20 =       "%20"
         regexSlash =    "\s\/"
 
-        matchAttach = re.search(regexAttached,line)
+        matchAttach = search(regexAttached,line)
         if matchAttach:
             attachment = matchAttach.group(1)
             # Clean UID
-            attachment = re.sub(regexUID," ",attachment)
+            attachment = sub(regexUID," ",attachment)
             # correct spaces
-            attachment = re.sub(regex20," ",attachment)
-            attachment = re.sub(regexSlash,"/",attachment).strip()
+            attachment = sub(regex20," ",attachment)
+            attachment = sub(regexSlash,"/",attachment).strip()
             
             # Reconstruct Links as embedded links
             embededLink = "![["+attachment+"]] "
 
-            line = re.sub(regexAttached, embededLink, line)        
+            line = sub(regexAttached, embededLink, line)        
             # print(line)        
         
         
@@ -256,7 +256,7 @@ def N2Omd(mdFile):
         regexTags = "^Tags:\s(.+)"
         
          # Search for Internal Links. Will give match.group(1) & match.group(2)
-        tagMatch = re.search(regexTags,line)
+        tagMatch = search(regexTags,line)
         
         Otags = []
         if tagMatch:

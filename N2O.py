@@ -4,21 +4,23 @@ Created on Thu Jun 18 13:34:37 2020
 
 @author: books
 """
-import os
-import re
-import shutil
-import zipfile
+
+from os import makedirs, path
+from re import sub
+from shutil import copyfileobj, make_archive
+from zipfile import ZipFile
 from pathlib import Path
 import N2Omodule
-import tempfile
-import easygui
+from tempfile import TemporaryDirectory
+from easygui import fileopenbox
 
 
-NotionZip = Path(easygui.fileopenbox())
+NotionZip = Path(fileopenbox())
+# NotionZip = Path(r'D:\Box Sync\Gpython\Notion2Obsidian-20200617\NotionExport-orig-minimal.zip')
 
 
 # Load zip file
-notionsData = zipfile.ZipFile(NotionZip, 'r')
+notionsData = ZipFile(NotionZip, 'r')
 
 NotionPathRaw = []
 ObsidianPathRaw = []
@@ -36,7 +38,7 @@ ObsidianPaths = []
 # Clean paths for Obsidian destination
 regexUID = "\s\w{32}"
 for line in NotionPathRaw:
-    ObsidianPathRaw.append(re.sub(regexUID, "", line))
+    ObsidianPathRaw.append(sub(regexUID, "", line))
 # [print(l[0],l[1]) for l in enumerate(ObsidianPaths)]
 
 
@@ -57,7 +59,7 @@ for i in csvIndex:
 
 
 ## Create a temporary directory to work with
-unzipt = tempfile.TemporaryDirectory()
+unzipt = TemporaryDirectory()
 tempPath = Path(unzipt.name)
 # print('tempPath',tempPath)
 
@@ -72,8 +74,7 @@ for d in folderTree:
 
 ## Create the temporary directory structure for future archive
 for d in tempDirectories:
-    os.makedirs(d, exist_ok=True)
-# print(os.listdir(unzipt.name))
+    makedirs(d, exist_ok=True)
 
 
 
@@ -94,7 +95,7 @@ for n in csvIndex:
         newfilepath = tempPath / ObsidianPaths[n]
         
         # Check if file exists, append if true
-        if os.path.exists(newfilepath):
+        if path.exists(newfilepath):
             append_write = 'a' # append if already exists
         else:
             append_write = 'w' # make a new file if not
@@ -129,7 +130,7 @@ for n in mdIndex:
         # print(newfilepath)
         
         # Check if file exists, append if true
-        if os.path.exists(newfilepath):
+        if path.exists(newfilepath):
             append_write = 'a' # append if already exists
         else:
             append_write = 'w' # make a new file if not
@@ -160,7 +161,7 @@ for n in othersIndex:
     
     with notionsData.open(NotionPathRaw[n]) as zf:
         with open(newfilepath, 'wb') as f:
-            shutil.copyfileobj(zf, f)
+            copyfileobj(zf, f)
 
     
 
@@ -168,7 +169,7 @@ for n in othersIndex:
 
 
 # Save temporary file collection to new zip
-shutil.make_archive( NotionZip.parent / (NotionZip.name[:-4]+'-ObsidianReady'), 'zip', tempPath)
+make_archive( NotionZip.parent / (NotionZip.name[:-4]+'-ObsidianReady'), 'zip', tempPath)
 
 
 
