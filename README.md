@@ -19,7 +19,7 @@ Should you want to save even more time, I have wrapped this process into a small
 
 I estimate that anyone using this guide can convert their Notion export in a day or less of work. Without this free guide, it would likely take several days of troubleshooting. If you’re a confident programmer, it may take a couple hours with this guide. I encourage everyone to go through the process. It is rather satisfying.
 
-However, if your time is worth more spent elsewhere, consider what the time savings is worth to you. My hole-in-the-bucket COVID-19 era income will greatly appreciate the help.
+However, if your time is worth more spent elsewhere, consider what the time savings is worth to you. My hole-in-the-bucket COVID-19 era income will greatly appreciate the help. Donation links are at the end of this documentation.
 
 Otherwise, let’s get started\! Here are the steps...
 
