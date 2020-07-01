@@ -106,41 +106,28 @@ def convertInternalLink(matchObj):
     regexSymbols = "[^\w\s]"
     regexSpaces = "\s+"
 
-    InternalTitle = matchObj.group(1)
+    userTitle = matchObj.group(1)
     ExternalURL = matchObj.group(2)
     urlTitle = matchObj.group(3)
     # print("Groups :",match.groups())
     
     # Replace symbols with space
-    InternalLink = re.sub(regexSymbols," ",InternalTitle)
     urlTitle = re.sub(regexSymbols," ",urlTitle)
     
     # Remove duplicate spaces
-    InternalLink = re.sub(regexSpaces, " ", InternalLink)
     urlTitle = re.sub(regexSpaces," ",urlTitle)
-    
-    # Remove any spaces at beginning
-    InternalLink = InternalLink.lstrip()
-    
+
     # Cut title at 50 characters
-    InternalLink = InternalLink[0:50]
     urlTitle = urlTitle[0:50]
     
     # Remove any spaces at end
-    InternalLink = InternalLink.rstrip()
     urlTitle = urlTitle.rstrip()
-
-    # Switch Notion Internal Link for Obsidian Internal Link
-    
-    # URL page title supercedes Internal Link name
-    if InternalLink != urlTitle:
-        InternalLink = urlTitle
-        
+   
     # Reconstruct Internal Links as pretty links and source footnote
-    if InternalLink == InternalTitle:
-        PrettyLink = "[["+InternalLink+"]] ^["+ExternalURL+"] "
+    if urlTitle == userTitle:
+        PrettyLink = "[["+urlTitle+"]] ^["+ExternalURL+"] "
     else:
-        PrettyLink = "[["+InternalLink+"|"+InternalTitle+"]] ^["+ExternalURL+"] "
+        PrettyLink = "[["+urlTitle+"|"+userTitle+"]] ^["+ExternalURL+"] "
 
     # Substitute regex find with PrettyLink
     return PrettyLink
