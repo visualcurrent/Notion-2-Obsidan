@@ -23,13 +23,13 @@ There will be five types of links in the exported files to modify:
 There may also be some *.csv* files that will need to be converted to *.md* files. 
 
 ## Methodology
-If you're interested, the full sequence of modifications needed to make your Notion export compatible with Obsidian can be found in the write-up found in the *Methodology.md* file in this git.
+If you're interested, the full sequence of modifications needed to make your Notion export compatible with Obsidian can be found in the write-up found in the (METHODOLOGY.md) file in this git.
 
 # Supporting the Work
 
 I’m happy to offer you this script and the conversion methodology for your content migration to Obsidian. If you're able and inclined, a donation for the convenience and time savings would be genuinely appreciated. There's a couple donation links at the bottom of this page.
 
-I estimate that anyone using the *Methodology.md* can convert their Notion export in a day or less of work. Without this guide, it would likely take several days of troubleshooting. If you’re a confident programmer, it may take you just a couple hours with this guide. I encourage everyone to go through the process. It is rather satisfying.
+I estimate that anyone using the [*Methodology.md*](METHODOLOGY.md) can convert their Notion export in a day or less of work. Without this guide, it would likely take several days of troubleshooting. If you’re a confident programmer, it may take you just a couple hours with this guide. I encourage everyone to go through the process. It is rather satisfying.
 
 However, if your time is worth more spent elsewhere. Feel free to use the code and switch to Obsidian in mere seconds! 
 
