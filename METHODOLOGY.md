@@ -8,7 +8,14 @@ If you follow this guide, use some tools to batch process your conversion. I've 
 Aside from Notion comments. This guide will give you full internal link and backlink integration for your content in Obsidian.
 
 # The Notion Export
-Out of the box, the export files that Notion provides do not migrate to Obsidian very well. All external links will work. But the hierarchical structure of your pages can only be navigated using Obsidian’s file explorer. None of the internal navigation links work, which also means there won’t be any backlinks or connections in Obsidian's Graph View.  Embedded images also won’t show. All of this can be remedied in the following outline. Note however, that Notion comments do NOT appear to be included in their export files.
+Out of the box, the export files that Notion provides do not migrate to Obsidian very well. All external links will work, but:
+
+- The hierarchical structure of your pages can only be navigated using Obsidian’s file explorer. 
+- None of the internal navigation links work, which also means there won’t be any backlinks or connections in Obsidian's Graph View. 
+- None of the content in your Notion tables will be viewable.  
+- Embedded images also won’t show. 
+
+All of this can be remedied by following the instructions below. Note however, that Notion comments do NOT appear to be included in their export files.
 
 Let's get started!
 
@@ -32,7 +39,7 @@ They look like this:
 
 `Random Notes 49330b16a1f54b4d92b442b25ea986de.md`
 
-We’ll want to remove these UIDs from all of your files and folders. Use a file renaming tool like [<ReNamer](http://www.den4b.com/products/renamer) to remove the last 33 characters (UID + space) of every file and folder. The steps that follow are based on Renamer. Interpret them as needed for whatever app you're using.
+We’ll want to remove these UIDs from all of your files and folders. Use a file renaming tool like [ReNamer](http://www.den4b.com/products/renamer) to remove the last 33 characters (UID + space) of every file and folder. The steps that follow are based on Renamer. Interpret them as needed for whatever app you're using.
 
 ## Trim the directory names first
 1. Filter Settings > Add folders as files; Include subfolders 
@@ -91,7 +98,7 @@ Process Link Names:
 1.  Isolate and save the {URL} portion
 2.  Isolate and save the {Link Name} portion
 3.  Isolate the {Note Name} portion to make it Obsidian friendly
-4.  Search and replace any symbols in the {Note Name} to a space. (Only alphanumerics, underscores, and spaces are retained in Notion exported filenames)
+4.  Search and replace any symbols in the {Note Name} to a space. **Only alphanumerics, underscores, and spaces** are retained in Notion exported filenames
 5.  Remove any duplicate spaces and leading/trailing spaces from the {Note Name}
 6.  Reconstruct Internal Links as pretty links with the source URL as a footnote
 	1.  If {Link Name} is the same as {Note Name} 
@@ -161,7 +168,7 @@ There may be broken links within Notion. Often a broken link in Notion still has
 Process the broken links:
 
 1.  Remove the URL section in parentheses
-2.  Only alphanumerics, underscores, and spaces are retained in Notion exported filenames. Convert all other symbols to a space
+2.  **Only alphanumerics, underscores, and spaces** are retained in Notion exported filenames. Convert all other symbols to a space
 3.  Replace duplicate spaces with a single space
 4.  Remove any leading or trailing spaces
 5.  Frame the modified title in Obsidian double square brackets
@@ -218,7 +225,7 @@ Beyond the first Internal Link column, all the data in the following columns exi
 Search and replace to modify the Internal Links in this order:
 
 1.  If there's a web link in the title, and the link includes URL identifier (http, https, ftp). It must be removed because Notion exports these pages without the URL identifier in the filename.
-2.  Only alphanumerics, underscores, and spaces are retained in Notion exported filenames. All other symbols need to be converted to a space.
+2.  **Only alphanumerics, underscores, and spaces** are retained in Notion exported filenames. All other symbols need to be converted to a space.
 3.  Replace duplicate spaces with a single space.
 4.  Remove any leading spaces
 5.  Notion cuts all filenames to a maximum of 50 characters. So cut the title to 50 characters if it’s longer.
