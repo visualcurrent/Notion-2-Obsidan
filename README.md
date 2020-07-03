@@ -12,15 +12,14 @@ The script will leave your orginal Notion archive unmodified.
 The resulting archive can be extracted and opened as, or added to, an Obsidian vault.
 
 ## The Problem with your Notion Export
-Out of the box, the export files that Notion provides do not migrate to Obsidian very well. All external links will work. But the hierarchical structure of your pages can only be navigated using Obsidian’s file explorer. None of the internal navigation links work, which also means there won’t be any backlinks or connections in Obsidian's Graph View.  Embedded images also won’t show. All of this can be remedied in the following outline. Note however, that Notion comments do NOT appear to be included in their export files.
+Out of the box, the export files that Notion provides do not migrate to Obsidian very well. All external links will work, but:
 
-There will be five types of links in the exported files to modify:
-- External links which can be ignored, as they are in a compatible format
-- User generated Internal Links
-- Two types of Notion generated Internal Links
-- And possibly some blank links that need correction
+- The hierarchical structure of your pages can only be navigated using Obsidian’s file explorer. 
+- None of the internal navigation links work, which also means there won’t be any backlinks or connections in Obsidian's Graph View. 
+- None of the content in your Notion tables will be viewable.  
+- Embedded images also won’t show. 
 
-There may also be some *.csv* files that will need to be converted to *.md* files. 
+All of this is remedied by this script. Note however, that Notion comments do NOT appear to be included in their export files.
 
 ## Methodology
 
