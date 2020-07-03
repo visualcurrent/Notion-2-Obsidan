@@ -14,11 +14,11 @@ Let's get started!
 
 ## Export Your Full Notion Database
 1.  From your Notion app, click the **Settings & Members** tab in the sidebar  
-	(media/image2.png)
+![Settings&Members](media/export1.png)
 2.  Find and click the **Settings** tab. Find the **Export content** section. Click the **Export all workspace content** button  
-	(media/image1.png)
+![Settings](media/export2.png)
 3.  Select **Markdown & CSV** as Export Format and click the **Export** button  
-	(media/image4.png)
+![Export](media/export3.png
 4.  Save the resulting .zip file to your computer
 5.  Extract the .zip contents to a known location
 
@@ -29,6 +29,7 @@ All user-generated content will show a 32 digit alphanumeric Unique Identifier (
 They look like this:
 
 `Meeting Notes 38f9b024692a4d0fbc14088d47c72d67`  
+
 `Random Notes 49330b16a1f54b4d92b442b25ea986de.md`
 
 We’ll want to remove these UIDs from all of your files and folders. Use a file renaming tool like [<ReNamer](http://www.den4b.com/products/renamer) to remove the last 33 characters (UID + space) of every file and folder. The steps that follow are based on Renamer. Interpret them as needed for whatever app you're using.
@@ -65,11 +66,11 @@ Your Notion export will contain *.md* files, *.csv* files, and may also contain 
 ### Convert Links to Obsidian Format 
 There will be five types of links in the exported files to process. When exported from Notion, they are all in the same "inline" wiki link format. But they differ enough to confidently identify and batch process each type with your search and replace tools.
 
-`[link name](external.web/address)`
-`[link name](notion.so/username/page+UID)`
-`[link name](subfolder+UID)`
-`[link name](about:blank#subfolder/page)`
-`[link name]`
+- `[link name](external.web/address)`
+- `[link name](notion.so/username/page+UID)`
+- `[link name](subfolder+UID)`
+- `[link name](about:blank#subfolder/page)`
+- `[link name]`
 
 ### External Links
 
@@ -101,7 +102,9 @@ Process Link Names:
 #### Regex
 
 This regex will capture what we need with the following groups:
+
 `\[(.[^\[\]\(\)]*)\]\((https:\/\/www.notion.so\/(?:.[^\/]*)\/(.[^\[\]\(\)]*)-.[^\[\]\(\)]*)\)`
+
 - Group 1: Pretty Link Title 
 - Group 2: URL
 - Group 3: target file name in web URL form (but not yet in Obsidian form) 
@@ -135,11 +138,13 @@ Process the relative paths in each line, in this order:
 Example Results:
 
 `[[Relative/Path/filename|Note Title]]`
+
 `[[Bodywork/Micronutrient Smoothie|Micronutrient Smoothie]]`
 
 #### Regex
 
 This regex will capture what we need with the following groups:
+
 `^\[(.+)\]\(([^\(]*)(?:\.md|\.csv)\)$`
 
 - Group 1: Note Title
@@ -150,6 +155,7 @@ This regex will capture what we need with the following groups:
 There may be broken links within Notion. Often a broken link in Notion still has an associated file. It’s worth capturing and converting any broken links. These links are easily identified by the `about:blank\#` string where a `notion.io` URL should be. Here are a couple examples:
 
 `[Evaluate on Tuesday](about:blank#Evaluate%20on%20Tuesday)`
+
 `[2017-1-15 19:14](about:blank#2017-1-15%2019%3A14)`
 
 Process the broken links:
@@ -163,11 +169,13 @@ Process the broken links:
 Results:
 
 `[[Evaluate on Tuesday]]`
+
 `[[2017 1 15 19 14]]`
 
 #### Regex
 
 This regex will capture what we need with the following groups:
+
 `\[(.[^\[\]\(\)]*)\]\(about:blank#.[^\[\]\(\)]*\)`
 
 - Group 1: Note Title
@@ -219,6 +227,7 @@ Search and replace to modify the Internal Links in this order:
 Now that all the Internal Links match their respective file names, wrap each one in double square brackets to be an Obsidian Internal Link.
 
 `[[filename one]]`
+
 `[[filename two]]`
 
 ### Rename CSV to MD
@@ -230,9 +239,9 @@ Once the Internal Links have been converted in a Notion CSV file, change the fil
 Nice work! You’re finished. Time to import everything into Obsidian.
 
 1.  Place all the converted files into a directory of your choosing
-2.  Open Obsidian and click the Vault Icon (media/image3.png)
+2.  Open Obsidian and click the Vault Icon ![vault icon](media/vaulticon.png)
 3.  Select **Open folder as vault**  
-(media/image5.png)
+![open vault](media/vault.png)
 4.  Use the Select Folder window to navigate to the directory with your newly converted files
 
 Enjoy the shift to Obsidian!

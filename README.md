@@ -23,13 +23,14 @@ There will be five types of links in the exported files to modify:
 There may also be some *.csv* files that will need to be converted to *.md* files. 
 
 ## Methodology
-If you're interested, the full sequence of modifications needed to make your Notion export compatible with Obsidian can be found in the write-up found in the [METHODOLOGY.md] file in this git.
+
+If you're interested, the full sequence of modifications needed to make your Notion export compatible with Obsidian can be found in the write-up found in the [Methodology.md](METHODOLOGY.md) file in this git.
 
 # Supporting the Work
 
 I’m happy to offer you this script and the conversion methodology for your content migration to Obsidian. If you're able and inclined, a donation for the convenience and time savings would be genuinely appreciated. There's a couple donation links at the bottom of this page.
 
-I estimate that anyone using the *Methodology.md* can convert their Notion export in a day or less of work. Without this guide, it would likely take several days of troubleshooting. If you’re a confident programmer, it may take you just a couple hours with this guide. I encourage everyone to go through the process. It is rather satisfying.
+I estimate that anyone using the [Methodology.md](METHODOLOGY.md) can convert their Notion export in a day or less of work. Without this guide, it would likely take several days of troubleshooting. If you’re a confident programmer, it may take you just a couple hours with this guide. I encourage everyone to go through the process. It is rather satisfying.
 
 However, if your time is worth more spent elsewhere. Feel free to use the code and switch to Obsidian in mere seconds! 
 
@@ -37,11 +38,11 @@ However, if your time is worth more spent elsewhere. Feel free to use the code a
 If you haven't already, you'll need to export your content from Notion.
 
 1.  From your Notion app, click the **Settings & Members** tab in the sidebar  
-(media/image2.png)
+![Settings&Members](media/export1.png)
 2.  Find and click the **Settings** tab. Find the **Export content** section. Click the **Export all workspace content** button  
-(media/image1.png)
+![Settings](media/export2.png)
 3.  Select **Markdown & CSV** as Export Format and click the **Export** button  
-(media/image4.png)
+![Export](media/export3.png)
 4.  Save the resulting .zip file to your computer
 5.  Extract the .zip contents to a known location
 
@@ -56,10 +57,9 @@ If you haven't already, you'll need to export your content from Notion.
 Time to import everything into Obsidian
 
 1.  Place all the converted files into a directory of your choosing
-2.  Open Obsidian and click the Vault Icon 
-(media/image3.png)
+2.  Open Obsidian and click the Vault Icon ![vault icon](media/vaulticon.png)
 3.  Select **Open folder as vault**  
-(media/image5.png)
+![open vault](media/vault.png)
 4.  Use the Select Folder window to navigate to the directory with your newly converted files
   
 Enjoy the shift to Obsidian!
