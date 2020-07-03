@@ -17,6 +17,15 @@ Out of the box, the export files that Notion provides do not migrate to Obsidian
 
 All of this can be remedied by following the instructions below. Note however, that Notion comments do NOT appear to be included in their export files.
 
+There will be five types of links in the exported files:
+
+- External links which can be ignored, as they are in a compatible format
+- User generated Internal Links
+- Two types of Notion generated Internal Links
+- And possibly some blank links that need correction
+
+There may also be some *.csv* files that will need to be converted to *.md* files. 
+
 Let's get started!
 
 ## Export Your Full Notion Database
