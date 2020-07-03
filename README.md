@@ -23,6 +23,7 @@ There will be five types of links in the exported files to modify:
 There may also be some *.csv* files that will need to be converted to *.md* files. 
 
 ## Methodology
+
 If you're interested, the full sequence of modifications needed to make your Notion export compatible with Obsidian can be found in the write-up found in the [Methodology.md](METHODOLOGY.md) file in this git.
 
 # Supporting the Work
