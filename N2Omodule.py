@@ -38,7 +38,6 @@ def ObsIndex(contents):
     for line in enumerate(contents):
         if line[1].suffix == ".md":
             mdIndex.append(line[0]) #save index
-    # print("mdIndex",mdIndex)
     
     
     ## Index the .csv files
@@ -46,13 +45,11 @@ def ObsIndex(contents):
     for line in enumerate(contents):
         if line[1].suffix == ".csv":
             csvIndex.append(line[0]) #save index
-    # print("csvIndex",csvIndex)
 
     
     ## index the other files using set difference
     othersIndex = list(set(range(0,len(contents)))
         - (set(folderIndex)|set(mdIndex)|set(csvIndex)))
-    # [print(i, contents[i]) for i in othersIndex]
     
     return mdIndex, csvIndex, othersIndex, folderIndex, folderTree
 
@@ -109,7 +106,6 @@ def convertInternalLink(matchObj):
     userTitle = matchObj.group(1)
     ExternalURL = matchObj.group(2)
     urlTitle = matchObj.group(3)
-    # print("Groups :",match.groups())
     
     # Replace symbols with space
     urlTitle = sub(regexSymbols," ",urlTitle)
@@ -197,7 +193,6 @@ def N2Omd(mdFile):
             PrettyLink = "[["+relativePath+"|"+Title+"]] "
 
             line = PrettyLink
-            # print(line)
         
         
         
@@ -248,8 +243,7 @@ def N2Omd(mdFile):
             # Reconstruct Links as embedded links
             embededLink = "![["+attachment+"]] "
 
-            line = sub(regexAttached, embededLink, line)        
-            # print(line)        
+            line = sub(regexAttached, embededLink, line)              
         
         
         # Convert tags after lines starting with "Tags:"
@@ -265,10 +259,7 @@ def N2Omd(mdFile):
                 Otags.append("#"+t[1].strip())
 
             line = "Tags: "+", ".join(Otags)
-            # print(line)
     
-
-
 
         newLines.append(line)
     

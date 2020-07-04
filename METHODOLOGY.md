@@ -77,7 +77,7 @@ Any page in the export package may have links that need conversion to an Obsidia
 
 ## Process the .md Files
 
-Your Notion export will contain *.md* files, *.csv* files, and may also contain image or other attachment files. The *.csv* files will everntually be converted to *.md* files. As a matter of organization simplicity, we'll process all the .md files first before introducing the *.csv* files.
+Your Notion export will contain *.md* files, *.csv* files, and may also contain image or other attachment files. The *.csv* files will eventually be converted to *.md* files. As a matter of organization simplicity, we'll process all the .md files first before introducing the *.csv* files.
 
 ### Convert Links to Obsidian Format 
 There will be five types of links in the exported files to process. When exported from Notion, they are all in the same "inline" wiki link format. But they differ enough to confidently identify and batch process each type with your search and replace tools.
