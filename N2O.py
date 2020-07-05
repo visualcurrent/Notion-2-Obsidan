@@ -6,7 +6,7 @@ Created on Thu Jun 18 13:34:37 2020
 """
 
 from os import makedirs, path
-from re import sub
+from re import compile
 from shutil import copyfileobj, make_archive
 from zipfile import ZipFile
 from pathlib import Path
@@ -34,9 +34,10 @@ ObsidianPaths = []
 
 
 # Clean paths for Obsidian destination
-regexUID = "\s\w{32}"
+regexUID = compile("\s\w{32}")
+
 for line in NotionPathRaw:
-    ObsidianPathRaw.append(sub(regexUID, "", line))
+    ObsidianPathRaw.append(regexUID.sub("", line))
 
 
 ### PATHS IN PROPER OS FORM BY PATHLIB ###

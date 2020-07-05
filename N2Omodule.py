@@ -7,7 +7,7 @@ Created on Thu Jun 25 14:16:18 2020
 
 from io import TextIOWrapper
 from os import path
-from re import sub, search
+from re import compile, search
 from csv import DictReader
 from pathlib import Path
 
@@ -71,16 +71,17 @@ def N2Ocsv(csvFile):
     mdTitle = []
 
     # Clean Internal Links
-    regexURLid = "(?:https?|ftp):\/\/"
-    regexSymbols = "[^\w\s]"
-    regexSpaces = "\s+"
+    regexURLid = compile("(?:https?|ftp):\/\/")
+    regexSymbols = compile("[^\w\s]")
+    regexSpaces = compile("\s+")
+
     for line in oldTitle:
         line = line.rstrip()
         #1 Replace URL identifiers and/or symbols with a space
-        line = sub(regexURLid," ",line)
-        line = sub(regexSymbols," ",line)
+        line = regexURLid.sub(" ",line)
+        line = regexSymbols.sub(" ",line)
          #2 Remove duplicate spaces
-        line = sub(regexSpaces, " ", line)        
+        line = regexSpaces.sub(" ", line)        
         #3 Remove any spaces at beginning
         line = line.lstrip()
         #4 Cut title at 50 characters
@@ -100,18 +101,18 @@ def N2Ocsv(csvFile):
 def convertInternalLink(matchObj):
 # converts Notion Internal links (found by regex) to Obsidian pretty links
 
-    regexSymbols = "[^\w\s]"
-    regexSpaces = "\s+"
+    regexSymbols = compile("[^\w\s]")
+    regexSpaces = compile("\s+")
 
     userTitle = matchObj.group(1)
     ExternalURL = matchObj.group(2)
     urlTitle = matchObj.group(3)
     
     # Replace symbols with space
-    urlTitle = sub(regexSymbols," ",urlTitle)
+    urlTitle = regexSymbols.sub(" ",urlTitle)
     
     # Remove duplicate spaces
-    urlTitle = sub(regexSpaces," ",urlTitle)
+    urlTitle = regexSpaces.sub(" ",urlTitle)
 
     # Cut title at 50 characters
     urlTitle = urlTitle[0:50]
@@ -131,16 +132,16 @@ def convertInternalLink(matchObj):
 def convertBlankLink(matchObj):
 # converts Notion about:blank links (found by regex) to Obsidian pretty links
 
-    regexSymbols = "[^\w\s]"
-    regexSpaces = "\s+"
+    regexSymbols = compile("[^\w\s]")
+    regexSpaces = compile("\s+")
     
     InternalTitle = matchObj.group(1)
     
     # Replace symbols with space
-    InternalLink = sub(regexSymbols," ",InternalTitle)
+    InternalLink = regexSymbols.sub(" ",InternalTitle)
     
     # Remove duplicate spaces
-    InternalLink = sub(regexSpaces, " ", InternalLink)
+    InternalLink = regexSpaces.sub( " ", InternalLink)
     
     # Remove any spaces at beginning
     InternalLink = InternalLink.lstrip()
@@ -172,22 +173,22 @@ def N2Omd(mdFile):
         
   
     # folder style links
-        regexPath =     "^\[(.+)\]\(([^\(]*)(?:\.md|\.csv)\)$" 
-        regexUID =      "%20\w{32}"
-        regex20 =       "%20"
-        regexSlash =    "\s\/"
+        regexPath =     compile("^\[(.+)\]\(([^\(]*)(?:\.md|\.csv)\)$")
+        regexUID =      compile("%20\w{32}")
+        regex20 =       compile("%20")
+        regexSlash =    compile("\s\/")
         
         # Identify and group relative paths
-        pathMatch = search(regexPath,line)
+        pathMatch = regexPath.search(line)
         # modify paths into local links. just remove UID and convert spaces
         if pathMatch:
             Title = pathMatch.group(1)
             relativePath = pathMatch.group(2)
             # Clean UID
-            relativePath = sub(regexUID," ",relativePath)
+            relativePath = regexUID.sub(" ",relativePath)
             # correct spaces
-            relativePath = sub(regex20," ",relativePath)
-            relativePath = sub(regexSlash,"/",relativePath).strip()
+            relativePath = regex20.sub(" ",relativePath)
+            relativePath = regexSlash.sub("/",relativePath).strip()
             
             # Reconstruct Links as pretty links
             if relativePath == Title:
@@ -205,12 +206,12 @@ def N2Omd(mdFile):
         ## Group1:Pretty Link Title 
         ## Group2: URL. 
         ## Group3: target file name (in web form but not in exported form without symbols) 
-        regexInternalLink = "\[(.[^\[\]\(\)]*)\]\((https:\/\/www.notion.so\/(?:.[^\/]*)\/(.[^\[\]\(\)]*)-.[^\[\]\(\)]*)\)"
+        regexInternalLink = compile("\[(.[^\[\]\(\)]*)\]\((https:\/\/www.notion.so\/(?:.[^\/]*)\/(.[^\[\]\(\)]*)-.[^\[\]\(\)]*)\)")
         
-        match = search(regexInternalLink,line)
+        match = regexInternalLink.search(line)
         # Substitute regex find with PrettyLink
         if match:
-            line = sub(regexInternalLink, convertInternalLink, line)       
+            line = regexInternalLink.sub(convertInternalLink, line)       
 
         
         
@@ -218,35 +219,35 @@ def N2Omd(mdFile):
         
         # about:blank links (lost or missing links within Notion)
         ## Group1:Pretty Link Title
-        regexBlankLink = "\[(.[^\[\]\(\)]*)\]\(about:blank#.[^\[\]\(\)]*\)"
+        regexBlankLink = compile("\[(.[^\[\]\(\)]*)\]\(about:blank#.[^\[\]\(\)]*\)")
         
-        matchBlank = search(regexBlankLink,line) 
+        matchBlank = regexBlankLink.search(line) 
         if matchBlank:
-            line = sub(regexBlankLink, convertBlankLink, line)
+            line = regexBlankLink.sub(convertBlankLink, line)
         
         
 
         
         
         # Embedded attachment links
-        regexAttached = "!\[(.[^\[\]\(\)]*)\]\((.[^\[\]\(\)]*)\)"
-        regexUID =      "%20\w{32}"
-        regex20 =       "%20"
-        regexSlash =    "\s\/"
+        regexAttached = compile("!\[(.[^\[\]\(\)]*)\]\((.[^\[\]\(\)]*)\)")
+        regexUID =      compile("%20\w{32}")
+        regex20 =       compile("%20")
+        regexSlash =    compile("\s\/")
 
-        matchAttach = search(regexAttached,line)
+        matchAttach = regexAttached.search(line)
         if matchAttach:
             attachment = matchAttach.group(1)
             # Clean UID
-            attachment = sub(regexUID," ",attachment)
+            attachment = regexUID.sub(" ",attachment)
             # correct spaces
-            attachment = sub(regex20," ",attachment)
-            attachment = sub(regexSlash,"/",attachment).strip()
+            attachment = regex20.sub(" ",attachment)
+            attachment = regexSlash.sub("/",attachment).strip()
             
             # Reconstruct Links as embedded links
             embededLink = "![["+attachment+"]] "
 
-            line = sub(regexAttached, embededLink, line)              
+            line = regexAttached.sub(embededLink, line)              
         
         
         # Convert tags after lines starting with "Tags:"
