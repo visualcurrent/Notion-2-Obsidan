@@ -190,8 +190,11 @@ def N2Omd(mdFile):
             relativePath = sub(regexSlash,"/",relativePath).strip()
             
             # Reconstruct Links as pretty links
-            PrettyLink = "[["+relativePath+"|"+Title+"]] "
-
+            if relativePath == Title:
+                PrettyLink = "[["+relativePath+"]] "
+            else:
+                PrettyLink = "[["+relativePath+"|"+Title+"]] "
+                
             line = PrettyLink
         
         
