@@ -24,7 +24,7 @@ def ObsIndex(contents):
     folderTree = []
 
     for line in enumerate(contents):
-        if not line[1].suffix:
+        if path.isdir(line[1]):
             folderIndex.append(line[0]) #save index
             folderTree.append(line[1])
     ## Case: directories are implicit

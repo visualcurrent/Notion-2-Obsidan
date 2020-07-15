@@ -34,7 +34,7 @@ ObsidianPaths = []
 
 
 # Clean paths for Obsidian destination
-regexUID = compile("\s\w{32}")
+regexUID = compile("\s+\w{32}")
 
 for line in NotionPathRaw:
     ObsidianPathRaw.append(regexUID.sub("", line))
