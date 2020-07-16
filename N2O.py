@@ -96,7 +96,7 @@ for n in csvIndex:
         
         # Save CSV internal links as new .md file
         with open(newfilepath, append_write) as tempFile:
-            [print(line.rstrip(), file=tempFile) for line in mdTitle]
+            [print(line.rstrip().encode("utf-8"), file=tempFile) for line in mdTitle]
 
 
 
@@ -134,11 +134,24 @@ for n in othersIndex:
     # Move the file from NotionPathRaw[n] in zip to newfilepath = tempPath / ObsidianPaths[n]
     newfilepath = tempPath / ObsidianPaths[n]
     
-    with notionsData.open(NotionPathRaw[n]) as zf:
-        with open(newfilepath, 'wb') as f:
-            copyfileobj(zf, f)
+    # Manage chance of attachments being corrupt. Save a file listing bad files
+    try:
+        ## if no issue, copy the file
+        with notionsData.open(NotionPathRaw[n]) as zf:
+            with open(newfilepath, 'wb') as f:
+                copyfileobj(zf, f)
+    except:
+        ## If there's issue, List bad files in a log file
+        with open(tempPath / 'ProblemFiles.md', 'a+', encoding='utf-8') as e:
+            if path.getsize(tempPath / 'ProblemFiles.md') == 0:
+                print('# List of corrupt files from', NotionZip, file=e)
+                print('', file=e)
+            print('  !!File Exception!!',ObsidianPaths[n])
+            print(NotionPathRaw[n], file=e)
+            print('', file=e)
 
-    
+
+
 
 
 # Save temporary file collection to new zip
