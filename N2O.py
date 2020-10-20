@@ -15,7 +15,7 @@ from tempfile import TemporaryDirectory
 from easygui import fileopenbox
 
 
-NotionZip = Path(fileopenbox())
+NotionZip = Path(fileopenbox(iletypes = ['*.txt']))
 
 
 # Load zip file
