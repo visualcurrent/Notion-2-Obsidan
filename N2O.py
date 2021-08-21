@@ -104,8 +104,7 @@ for n in csvIndex:
 
 
 
-
-
+num_link = [0, 0, 0, 0]
 # Process all MD files
 for n in mdIndex:
     
@@ -113,8 +112,8 @@ for n in mdIndex:
     with notionsData.open(NotionPathRaw[n], "r") as mdFile:
         
         # Find and convert Internal Links to Obsidian style
-        mdContent = N2Omodule.N2Omd(mdFile)
-
+        mdContent, cnt = N2Omodule.N2Omd(mdFile)
+        num_link = [cnt[i]+num_link[i] for i in range(len(num_link))]
         
         # Exported md file include header in first line
         # '# title of file'
@@ -132,7 +131,7 @@ for n in mdIndex:
         # Save modified content as new .md file
         with open(newfilepath, append_write, encoding='utf-8') as tempFile:
             [print(line.rstrip(), file=tempFile) for line in mdContent]
-        
+
 
 
 
@@ -158,8 +157,12 @@ for n in othersIndex:
             print(NotionPathRaw[n], file=e)
             print('', file=e)
 
-
-
+    
+print(f"\nTotal converted links:")
+print(f"    - Internal links: {num_link[0]}")
+print(f"    - Embedded links: {num_link[1]}")
+print(f"    - Blank links   : {num_link[2]}")
+print(f"    - Number tags   : {num_link[3]}")
 
 
 # Save temporary file collection to new zip
