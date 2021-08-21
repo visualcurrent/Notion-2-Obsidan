@@ -72,7 +72,9 @@ def N2Ocsv(csvFile):
 
     # Clean Internal Links
     regexURLid = compile("(?:https?|ftp):\/\/")
-    regexSymbols = compile("[^\w\s]")
+
+    # Clean symbol invalid window path   < > : " / \ | ? *
+    regexSymbols = compile("[<>?:/\|*]")
     regexSpaces = compile("\s+")
 
     for line in oldTitle:
@@ -81,11 +83,11 @@ def N2Ocsv(csvFile):
         line = regexURLid.sub(" ",line)
         line = regexSymbols.sub(" ",line)
          #2 Remove duplicate spaces
-        line = regexSpaces.sub(" ", line)        
+        line = regexSpaces.sub(" ", line) 
         #3 Remove any spaces at beginning
         line = line.lstrip()
         #4 Cut title at 50 characters
-        line = str(line)[0:50]
+        line = str(line)
         #5 Remove any spaces at end
         line = line.rstrip()    
         if line:
@@ -191,10 +193,13 @@ def N2Omd(mdFile):
             relativePath = regexSlash.sub("/",relativePath).strip()
             
             # Reconstruct Links as pretty links
-            if relativePath == Title:
-                PrettyLink = "[["+relativePath+"]] "
-            else:
-                PrettyLink = "[["+relativePath+"|"+Title+"]] "
+            
+            PrettyLink = "[["+Title+"]]" 
+
+            #if relativePath == Title:
+            #    PrettyLink = "[["+relativePath+"]] "
+            #else:
+            #    PrettyLink = "[["+relativePath+"|"+Title+"]] "
                 
             line = PrettyLink
         

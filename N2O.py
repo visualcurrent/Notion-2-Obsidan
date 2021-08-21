@@ -31,7 +31,10 @@ ObsidianPaths = []
 # Generate a list of file paths for all zip content
 [NotionPathRaw.append(line.rstrip()) for line in notionsData.namelist()]
 
-
+verbose = False
+def debug_print(msg):
+    if verbose:
+        print(msg)
 
 # Clean paths for Obsidian destination
 regexUID = compile("\s+\w{32}")
@@ -84,7 +87,7 @@ for n in csvIndex:
          
         # Convert CSV content into Obsidian Internal Links
         mdTitle = N2Omodule.N2Ocsv(csvFile)
-    
+
         ## Make temp destination file path
         newfilepath = tempPath / ObsidianPaths[n]
         
@@ -95,8 +98,8 @@ for n in csvIndex:
             append_write = 'w' # make a new file if not
         
         # Save CSV internal links as new .md file
-        with open(newfilepath, append_write) as tempFile:
-            [print(line.rstrip().encode("utf-8"), file=tempFile) for line in mdTitle]
+        with open(newfilepath, append_write, encoding='utf-8') as tempFile:
+            [print(line.rstrip(), file=tempFile) for line in mdTitle]
 
 
 
@@ -111,9 +114,14 @@ for n in mdIndex:
         
         # Find and convert Internal Links to Obsidian style
         mdContent = N2Omodule.N2Omd(mdFile)
+
         
+        # Exported md file include header in first line
+        # '# title of file'
+        # Get full file name by first line of exported md file instead file name ObsidianPaths[n]
         ## Make temp destination file path
-        newfilepath = tempPath / ObsidianPaths[n]
+        new_file_name = mdContent[0].replace('# ', '') + '.md'
+        newfilepath = tempPath / path.dirname(ObsidianPaths[n]) / new_file_name
         
         # Check if file exists, append if true
         if path.exists(newfilepath):
