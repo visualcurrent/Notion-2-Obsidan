@@ -38,6 +38,7 @@ def debug_print(msg):
 
 # Clean paths for Obsidian destination
 regexUID = compile("\s+\w{32}")
+regexForbitCharacter = compile("[<>?:/\|*\"]")
 
 for line in NotionPathRaw:
     ObsidianPathRaw.append(regexUID.sub("", line))
@@ -102,8 +103,6 @@ for n in csvIndex:
             [print(line.rstrip(), file=tempFile) for line in mdTitle]
 
 
-
-
 num_link = [0, 0, 0, 0]
 # Process all MD files
 for n in mdIndex:
@@ -120,6 +119,7 @@ for n in mdIndex:
         # Get full file name by first line of exported md file instead file name ObsidianPaths[n]
         ## Make temp destination file path
         new_file_name = mdContent[0].replace('# ', '') + '.md'
+        new_file_name = regexForbitCharacter.sub("", new_file_name)
         newfilepath = tempPath / path.dirname(ObsidianPaths[n]) / new_file_name
         
         # Check if file exists, append if true

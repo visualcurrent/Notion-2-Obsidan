@@ -214,7 +214,15 @@ def internal_link_convert(line):
                     byte_1 = "0x" + utf8_match.group(1)
                     byte_2 = "0x" + utf8_match.group(2)
                     bytes_unicode = bytes([int(byte_1,0), int(byte_2,0)])
-                    relativePath = regexutf8.sub(str(bytes_unicode, 'utf-8'), relativePath, 1)
+                    try:
+                        unicode_str = str(bytes_unicode, 'utf-8')
+                    except:
+                        print("ERROR: convert unicode failed")
+                        print(f"   {bytes_unicode} in - {line}")
+                        break
+
+                    relativePath = regexutf8.sub(unicode_str, relativePath, 1)
+  
             
             line, num_matchs = regexPath.subn("[["+relativePath+"]]", line)
             if num_matchs > 1:
