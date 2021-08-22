@@ -12,6 +12,41 @@ from csv import DictReader
 from pathlib import Path
 
 
+def str_slash_char_remove(string):
+
+    #regex_forbidden_characters = compile('[\\/*?:"<>|]')
+    regexSlash = compile("\/")
+    string = regexSlash.sub('', string)
+
+    return string
+
+
+def str_forbid_char_remove(string):
+
+    #regex_forbidden_characters = compile('[\\/*?:"<>|]')
+    regex_forbidden_characters = compile('[\\*?:"<>|]')
+    string = regex_forbidden_characters.sub('', string)
+
+    return string
+
+
+# convert %20 to ' '
+def str_space_utf8_replace(string):
+
+    regex_utf8_space = compile("%20")
+    string = regex_utf8_space.sub(' ', string)
+
+    return string
+
+
+def str_notion_uid_remove(string):
+
+    regexUID = compile("%20\w{32}")
+    string = regexUID.sub('', string)
+
+    return string
+
+
 def ObsIndex(contents):
     """
     Function to return all the relevant indices 
@@ -74,7 +109,7 @@ def N2Ocsv(csvFile):
     regexURLid = compile("(?:https?|ftp):\/\/")
 
     # Clean symbol invalid window path   < > : " / \ | ? *
-    regexSymbols = compile("[<>?:/\|*]")
+    regexSymbols = compile("[<>?:/\|*\"]")
     regexSpaces = compile("\s+")
 
     for line in oldTitle:
@@ -137,35 +172,78 @@ def convertBlankLink(line):
             print(f"Warning: {line} replaced {num_matchs} matchs!!")
             
     return line, num_matchs
-    
 
 def embedded_link_convert(line):
+    '''
+    This internal links combine:
+    - Link to local page
+    - External notion page
+    - Link to Database ~ exported *.csv file
+    - png in notion
+    '''
 
-    # Embedded attachment links
-    regexAttached = compile("!\[(.[^\[\]\(\)]*)\]\((.[^\[\]\(\)]*)\)")
-    regexUID =      compile("%20\w{32}")
-    regex20 =       compile("%20")
-    regexSlash =    compile("\s\/")
+    # folder style links
+    #regexPath =     compile("^\[(.+)\]\(([^\(]*)(?:\.md|\.csv)\)$") # Overlap incase multiple links in same line
+    #regexRelativePathImage  =   compile("(?:\.png|\.jpg|\.gif|\.bmp|\.jpeg|\.svg)")
+
+    regexPath               =   compile("!\[(.*?)\]\((.*?)\)")
+    regex20                 =   compile("%20")
 
     num_matchs = 0
-    matchAttach = regexAttached.search(line)
-    if matchAttach:
-        attachment = matchAttach.group(1)
-        # Clean UID
-        attachment = regexUID.sub(" ",attachment)
-        # correct spaces
-        attachment = regex20.sub(" ",attachment)
-        attachment = regexSlash.sub("/",attachment).strip()
+    # Identify and group relative paths
+    # While for incase multiple match on single line
+    pathMatch = regexPath.search(line)
+    if pathMatch:
+        # modify paths into local links. just remove UID and convert spaces
+        Title = pathMatch.group(1)
+        relativePath = pathMatch.group(2)
+        #is_image = regexRelativePathImage.search(relativePath)
+
+        regexSpecialUtf8 = compile("%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])")
+        regexutf8 =    compile("%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])")
+        regexUID =      compile("%20\w{32}")
         
-        # Reconstruct Links as embedded links
-        embededLink = "![["+attachment+"]] "
-        line, num_matchs = regexAttached.subn(embededLink, line)
+        relativePath = str_forbid_char_remove(relativePath)
+        relativePath = regexUID.sub("", relativePath)
+        relativePath = str_space_utf8_replace(relativePath)
+        
+        utf8_match = regexutf8.search(relativePath)
+        while utf8_match:
+            is_special_utf8 = False
+            utf8_match = regexutf8.search(relativePath)
+            if utf8_match:
+                byte_1 = "0x" + utf8_match.group(1)
+                byte_2 = "0x" + utf8_match.group(2)
+
+                if (byte_1[0:3] == "0xE") and (byte_1[3] in ['1', '2', '3', '4', '5', '6']):
+                    
+                    special_utf8_match = regexSpecialUtf8.search(relativePath)
+                    byte_3 = "0x" + special_utf8_match.group(3)
+                    bytes_unicode = bytes([int(byte_1,0), int(byte_2,0), int(byte_3,0)])
+                    is_special_utf8 = True
+                else:
+                    bytes_unicode = bytes([int(byte_1,0), int(byte_2,0)])
+
+                try:
+                    unicode_str = str(bytes_unicode, 'utf-8')
+                except:
+                    print("ERROR: convert unicode failed")
+                    print(f"   {bytes_unicode} in - {line}")
+                    break
+
+                if is_special_utf8:
+                    relativePath = regexSpecialUtf8.sub(unicode_str, relativePath, 1)
+                else:
+                    relativePath = regexutf8.sub(unicode_str, relativePath, 1)
+
+        line, num_matchs = regexPath.subn("[["+relativePath+"]]", line)
+
         if num_matchs > 1:
             print(f"Warning: {line} replaced {num_matchs} matchs!!")
 
     return line, num_matchs
 
-    
+
 def internal_link_convert(line):
     '''
     This internal links combine:
@@ -181,7 +259,8 @@ def internal_link_convert(line):
     regex20                 =   compile("%20")
     regexRelativePathNotion =   compile("https:\/\/www\.notion\.so")
     regexRelativePathMdCsv  =   compile("(?:\.md|\.csv)")
-    regexRelativePathPng    =   compile("(?:\.png)")
+    regexRelativePathImage  =   compile("(?:\.png|\.jpg|\.gif|\.bmp|\.jpeg|\.svg)")
+    regexSlash =    compile("\/")
 
     num_matchs = 0
     # Identify and group relative paths
@@ -191,42 +270,28 @@ def internal_link_convert(line):
         # modify paths into local links. just remove UID and convert spaces
         # Title = pathMatch.group(1)
         relativePath = pathMatch.group(2)
-        notionMatch = regexRelativePathNotion.search(relativePath)
+        notionMatch  = regexRelativePathNotion.search(relativePath)
         is_md_or_csv = regexRelativePathMdCsv.search(relativePath)
-        is_png = regexRelativePathPng.search(relativePath)
+        is_image = regexRelativePathImage.search(relativePath)
 
         if is_md_or_csv or notionMatch:
             # Replace all matchs 
             # line = regexPath.sub("[["+<group 1>+"]]", line)
             line, num_matchs = regexPath.subn("[["+'\\1'''+"]]", line)
-        elif is_png:
-            regexutf8 =    compile("%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])")
-            regexSlash =    compile("\/")
-            regexUID =      compile("%20\w{32}")
             
-            relativePath = regexUID.sub("", relativePath)
-            relativePath = regex20.sub(" ", relativePath)
-            
-            utf8_match = regexutf8.search(relativePath)
-            while utf8_match:
-                utf8_match = regexutf8.search(relativePath)
-                if utf8_match:
-                    byte_1 = "0x" + utf8_match.group(1)
-                    byte_2 = "0x" + utf8_match.group(2)
-                    bytes_unicode = bytes([int(byte_1,0), int(byte_2,0)])
-                    try:
-                        unicode_str = str(bytes_unicode, 'utf-8')
-                    except:
-                        print("ERROR: convert unicode failed")
-                        print(f"   {bytes_unicode} in - {line}")
-                        break
+            regexMarkdownLink = compile("\[\[(.*?)\]\]")
+            markdownLinkMatch = regexMarkdownLink.search(line)
+            if markdownLinkMatch:
+                title = markdownLinkMatch.group(1)
+                title = str_notion_uid_remove(title)
+                title = str_space_utf8_replace(title)
+                title = str_forbid_char_remove(title)
+                title = str_slash_char_remove(title)
 
-                    relativePath = regexutf8.sub(unicode_str, relativePath, 1)
-  
-            
-            line, num_matchs = regexPath.subn("[["+relativePath+"]]", line)
-            if num_matchs > 1:
-                print(f"Warning: {line} replaced {num_matchs} matchs!!")
+                if title != markdownLinkMatch.group(1):
+                    print(line)
+                    line = regexMarkdownLink.sub("[["+title+"]]", line)
+                    print(f" remove forbid {line}\n")
 
     return line, num_matchs
 
@@ -250,6 +315,7 @@ def feature_tags_convert(line):
     
     return line, num_tag
 
+
 def N2Omd(mdFile):
 
     newLines = []
@@ -262,11 +328,11 @@ def N2Omd(mdFile):
 
         line = line.decode("utf-8").rstrip()
 
-        line, cnt = internal_link_convert(line)
-        in_link_cnt += cnt
-
         line, cnt = embedded_link_convert(line)
         em_link_cnt += cnt
+
+        line, cnt = internal_link_convert(line)
+        in_link_cnt += cnt
 
         line, cnt = convertBlankLink(line)
         bl_link_cnt += cnt
