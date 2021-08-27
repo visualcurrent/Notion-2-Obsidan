@@ -34,7 +34,7 @@ Let's get started!
 2.  Find and click the **Settings** tab. Find the **Export content** section. Click the **Export all workspace content** button  
 ![Settings](media/export2.png)
 3.  Select **Markdown & CSV** as Export Format and click the **Export** button  
-![Export](media/export3.png
+![Export](media/export3.png)
 4.  Save the resulting .zip file to your computer
 5.  Extract the .zip contents to a known location
 
