@@ -12,6 +12,41 @@ from csv import DictReader
 from pathlib import Path
 
 
+def str_slash_char_remove(string):
+
+    #regex_forbidden_characters = compile('[\\/*?:"<>|]')
+    regexSlash = compile("\/")
+    string = regexSlash.sub('', string)
+
+    return string
+
+
+def str_forbid_char_remove(string):
+
+    #regex_forbidden_characters = compile('[\\/*?:"<>|]')
+    regex_forbidden_characters = compile('[\\*?:"<>|]')
+    string = regex_forbidden_characters.sub('', string)
+
+    return string
+
+
+# convert %20 to ' '
+def str_space_utf8_replace(string):
+
+    regex_utf8_space = compile("%20")
+    string = regex_utf8_space.sub(' ', string)
+
+    return string
+
+
+def str_notion_uid_remove(string):
+
+    regexUID = compile("%20\w{32}")
+    string = regexUID.sub('', string)
+
+    return string
+
+
 def ObsIndex(contents):
     """
     Function to return all the relevant indices 
@@ -72,7 +107,9 @@ def N2Ocsv(csvFile):
 
     # Clean Internal Links
     regexURLid = compile("(?:https?|ftp):\/\/")
-    regexSymbols = compile("[^\w\s]")
+
+    # Clean symbol invalid window path   < > : " / \ | ? *
+    regexSymbols = compile("[<>?:/\|*\"]")
     regexSpaces = compile("\s+")
 
     for line in oldTitle:
@@ -81,11 +118,11 @@ def N2Ocsv(csvFile):
         line = regexURLid.sub(" ",line)
         line = regexSymbols.sub(" ",line)
          #2 Remove duplicate spaces
-        line = regexSpaces.sub(" ", line)        
+        line = regexSpaces.sub(" ", line) 
         #3 Remove any spaces at beginning
         line = line.lstrip()
         #4 Cut title at 50 characters
-        line = str(line)[0:50]
+        line = str(line)
         #5 Remove any spaces at end
         line = line.rstrip()    
         if line:
@@ -98,176 +135,216 @@ def N2Ocsv(csvFile):
     return mdTitle
 
 
-def convertInternalLink(matchObj):
-# converts Notion Internal links (found by regex) to Obsidian pretty links
-
-    regexSymbols = compile("[^\w\s]")
-    regexSpaces = compile("\s+")
-
-    userTitle = matchObj.group(1)
-    ExternalURL = matchObj.group(2)
-    urlTitle = matchObj.group(3)
-    
-    # Replace symbols with space
-    urlTitle = regexSymbols.sub(" ",urlTitle)
-    
-    # Remove duplicate spaces
-    urlTitle = regexSpaces.sub(" ",urlTitle)
-
-    # Cut title at 50 characters
-    urlTitle = urlTitle[0:50]
-    
-    # Remove any spaces at end
-    urlTitle = urlTitle.rstrip()
-   
-    # Reconstruct Internal Links as pretty links and source footnote
-    if urlTitle == userTitle:
-        PrettyLink = "[["+urlTitle+"]] ^["+ExternalURL+"] "
-    else:
-        PrettyLink = "[["+urlTitle+"|"+userTitle+"]] ^["+ExternalURL+"] "
-
-    # Substitute regex find with PrettyLink
-    return PrettyLink
-
-def convertBlankLink(matchObj):
+def convertBlankLink(line):
 # converts Notion about:blank links (found by regex) to Obsidian pretty links
 
     regexSymbols = compile("[^\w\s]")
     regexSpaces = compile("\s+")
+    num_matchs = 0
+    # about:blank links (lost or missing links within Notion)
+    ## Group1:Pretty Link Title
+    regexBlankLink = compile("\[(.[^\[\]\(\)]*)\]\(about:blank#.[^\[\]\(\)]*\)")
+    matchBlank = regexBlankLink.search(line) 
+    if matchBlank:
+
+        InternalTitle = matchBlank.group(1)
+        
+        # Replace symbols with space
+        InternalLink = regexSymbols.sub(" ",InternalTitle)
+        
+        # Remove duplicate spaces
+        InternalLink = regexSpaces.sub( " ", InternalLink)
+        
+        # Remove any spaces at beginning
+        InternalLink = InternalLink.lstrip()
+        
+        # Cut title at 50 characters
+        InternalLink = InternalLink[0:50]
+        
+        # Remove any spaces at end
+        InternalLink = InternalLink.rstrip()
+        
+        # Reconstruct Internal Links as pretty links
+        PrettyLink = "[["+InternalLink+"]] "
+        
+        line, num_matchs = regexBlankLink.subn(PrettyLink, line)        
+        if num_matchs > 1:
+            print(f"Warning: {line} replaced {num_matchs} matchs!!")
+            
+    return line, num_matchs
+
+def embedded_link_convert(line):
+    '''
+    This internal links combine:
+    - Link to local page
+    - External notion page
+    - Link to Database ~ exported *.csv file
+    - png in notion
+    '''
+
+    # folder style links
+    #regexPath =     compile("^\[(.+)\]\(([^\(]*)(?:\.md|\.csv)\)$") # Overlap incase multiple links in same line
+    #regexRelativePathImage  =   compile("(?:\.png|\.jpg|\.gif|\.bmp|\.jpeg|\.svg)")
+
+    regexPath               =   compile("!\[(.*?)\]\((.*?)\)")
+    regex20                 =   compile("%20")
+
+    num_matchs = 0
+    # Identify and group relative paths
+    # While for incase multiple match on single line
+    pathMatch = regexPath.search(line)
+    if pathMatch:
+        # modify paths into local links. just remove UID and convert spaces
+        Title = pathMatch.group(1)
+        relativePath = pathMatch.group(2)
+        #is_image = regexRelativePathImage.search(relativePath)
+
+        regexSpecialUtf8 = compile("%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])")
+        regexutf8 =    compile("%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])")
+        regexUID =      compile("%20\w{32}")
+        
+        relativePath = str_forbid_char_remove(relativePath)
+        relativePath = regexUID.sub("", relativePath)
+        relativePath = str_space_utf8_replace(relativePath)
+        
+        utf8_match = regexutf8.search(relativePath)
+        while utf8_match:
+            is_special_utf8 = False
+            utf8_match = regexutf8.search(relativePath)
+            if utf8_match:
+                byte_1 = "0x" + utf8_match.group(1)
+                byte_2 = "0x" + utf8_match.group(2)
+
+                if (byte_1[0:3] == "0xE") and (byte_1[3] in ['1', '2', '3', '4', '5', '6']):
+                    
+                    special_utf8_match = regexSpecialUtf8.search(relativePath)
+                    byte_3 = "0x" + special_utf8_match.group(3)
+                    bytes_unicode = bytes([int(byte_1,0), int(byte_2,0), int(byte_3,0)])
+                    is_special_utf8 = True
+                else:
+                    bytes_unicode = bytes([int(byte_1,0), int(byte_2,0)])
+
+                try:
+                    unicode_str = str(bytes_unicode, 'utf-8')
+                except:
+                    print("ERROR: convert unicode failed")
+                    print(f"   {bytes_unicode} in - {line}")
+                    break
+
+                if is_special_utf8:
+                    relativePath = regexSpecialUtf8.sub(unicode_str, relativePath, 1)
+                else:
+                    relativePath = regexutf8.sub(unicode_str, relativePath, 1)
+
+        line, num_matchs = regexPath.subn("[["+relativePath+"]]", line)
+
+        if num_matchs > 1:
+            print(f"Warning: {line} replaced {num_matchs} matchs!!")
+
+    return line, num_matchs
+
+
+def internal_link_convert(line):
+    '''
+    This internal links combine:
+    - Link to local page
+    - External notion page
+    - Link to Database ~ exported *.csv file
+    - png in notion
+    '''
+
+    # folder style links
+    #regexPath =     compile("^\[(.+)\]\(([^\(]*)(?:\.md|\.csv)\)$") # Overlap incase multiple links in same line
+    regexPath               =   compile("\[(.*?)\]\((.*?)\)")
+    regex20                 =   compile("%20")
+    regexRelativePathNotion =   compile("https:\/\/www\.notion\.so")
+    regexRelativePathMdCsv  =   compile("(?:\.md|\.csv)")
+    regexRelativePathImage  =   compile("(?:\.png|\.jpg|\.gif|\.bmp|\.jpeg|\.svg)")
+    regexSlash =    compile("\/")
+
+    num_matchs = 0
+    # Identify and group relative paths
+    # While for incase multiple match on single line
+    pathMatch = regexPath.search(line)
+    if pathMatch:
+        # modify paths into local links. just remove UID and convert spaces
+        # Title = pathMatch.group(1)
+        relativePath = pathMatch.group(2)
+        notionMatch  = regexRelativePathNotion.search(relativePath)
+        is_md_or_csv = regexRelativePathMdCsv.search(relativePath)
+        is_image = regexRelativePathImage.search(relativePath)
+
+        if is_md_or_csv or notionMatch:
+            # Replace all matchs 
+            # line = regexPath.sub("[["+<group 1>+"]]", line)
+            line, num_matchs = regexPath.subn("[["+'\\1'''+"]]", line)
+            
+            regexMarkdownLink = compile("\[\[(.*?)\]\]")
+            markdownLinkMatch = regexMarkdownLink.search(line)
+            if markdownLinkMatch:
+                title = markdownLinkMatch.group(1)
+                title = str_notion_uid_remove(title)
+                title = str_space_utf8_replace(title)
+                title = str_forbid_char_remove(title)
+                title = str_slash_char_remove(title)
+
+                if title != markdownLinkMatch.group(1):
+                    print(line)
+                    line = regexMarkdownLink.sub("[["+title+"]]", line)
+                    print(f" remove forbid {line}\n")
+
+    return line, num_matchs
+
+
+def feature_tags_convert(line):
+
+    # Convert tags after lines starting with "Tags:"
+    regexTags = "^Tags:\s(.+)"
     
-    InternalTitle = matchObj.group(1)
+        # Search for Internal Links. Will give match.group(1) & match.group(2)
+    tagMatch = search(regexTags,line)
     
-    # Replace symbols with space
-    InternalLink = regexSymbols.sub(" ",InternalTitle)
+    Otags = []
+    num_tag = 0
+    if tagMatch:
+        Ntags = tagMatch.group(1).split(",")
+        for t in enumerate(Ntags):
+            Otags.append("#"+t[1].strip())
+            num_tag += 1
+        line = "Tags: "+", ".join(Otags)
     
-    # Remove duplicate spaces
-    InternalLink = regexSpaces.sub( " ", InternalLink)
-    
-    # Remove any spaces at beginning
-    InternalLink = InternalLink.lstrip()
-    
-    # Cut title at 50 characters
-    InternalLink = InternalLink[0:50]
-    
-    # Remove any spaces at end
-    InternalLink = InternalLink.rstrip()
-    
-    # Reconstruct Internal Links as pretty links
-    PrettyLink = "[["+InternalLink+"]] "
-    
-    # Substitute regex find with PrettyLink
-    return PrettyLink
-    
-    
-    
+    return line, num_tag
+
 
 def N2Omd(mdFile):
-    # Local Dependancies: convertInternalLink(), convertBlankLink()
-    
+
     newLines = []
-    
+    em_link_cnt = 0
+    in_link_cnt = 0
+    bl_link_cnt = 0
+    tags_cnt = 0
+
     for line in mdFile:
+
         line = line.decode("utf-8").rstrip()
-    
-  
-        
-  
-    # folder style links
-        regexPath =     compile("^\[(.+)\]\(([^\(]*)(?:\.md|\.csv)\)$")
-        regexUID =      compile("%20\w{32}")
-        regex20 =       compile("%20")
-        regexSlash =    compile("\s\/")
-        
-        # Identify and group relative paths
-        pathMatch = regexPath.search(line)
-        # modify paths into local links. just remove UID and convert spaces
-        if pathMatch:
-            Title = pathMatch.group(1)
-            relativePath = pathMatch.group(2)
-            # Clean UID
-            relativePath = regexUID.sub(" ",relativePath)
-            # correct spaces
-            relativePath = regex20.sub(" ",relativePath)
-            relativePath = regexSlash.sub("/",relativePath).strip()
-            
-            # Reconstruct Links as pretty links
-            if relativePath == Title:
-                PrettyLink = "[["+relativePath+"]] "
-            else:
-                PrettyLink = "[["+relativePath+"|"+Title+"]] "
-                
-            line = PrettyLink
-        
-        
-        
-        
-        
-        # Internal style links. 
-        ## Group1:Pretty Link Title 
-        ## Group2: URL. 
-        ## Group3: target file name (in web form but not in exported form without symbols) 
-        regexInternalLink = compile("\[(.[^\[\]\(\)]*)\]\((https:\/\/www.notion.so\/(?:.[^\/]*)\/(.[^\[\]\(\)]*)-.[^\[\]\(\)]*)\)")
-        
-        match = regexInternalLink.search(line)
-        # Substitute regex find with PrettyLink
-        if match:
-            line = regexInternalLink.sub(convertInternalLink, line)       
 
-        
-        
-        
-        
-        # about:blank links (lost or missing links within Notion)
-        ## Group1:Pretty Link Title
-        regexBlankLink = compile("\[(.[^\[\]\(\)]*)\]\(about:blank#.[^\[\]\(\)]*\)")
-        
-        matchBlank = regexBlankLink.search(line) 
-        if matchBlank:
-            line = regexBlankLink.sub(convertBlankLink, line)
-        
-        
+        line, cnt = embedded_link_convert(line)
+        em_link_cnt += cnt
 
-        
-        
-        # Embedded attachment links
-        regexAttached = compile("!\[(.[^\[\]\(\)]*)\]\((.[^\[\]\(\)]*)\)")
-        regexUID =      compile("%20\w{32}")
-        regex20 =       compile("%20")
-        regexSlash =    compile("\s\/")
+        line, cnt = internal_link_convert(line)
+        in_link_cnt += cnt
 
-        matchAttach = regexAttached.search(line)
-        if matchAttach:
-            attachment = matchAttach.group(1)
-            # Clean UID
-            attachment = regexUID.sub(" ",attachment)
-            # correct spaces
-            attachment = regex20.sub(" ",attachment)
-            attachment = regexSlash.sub("/",attachment).strip()
-            
-            # Reconstruct Links as embedded links
-            embededLink = "![["+attachment+"]] "
+        line, cnt = convertBlankLink(line)
+        bl_link_cnt += cnt
 
-            line = regexAttached.sub(embededLink, line)              
-        
-        
-        # Convert tags after lines starting with "Tags:"
-        regexTags = "^Tags:\s(.+)"
-        
-         # Search for Internal Links. Will give match.group(1) & match.group(2)
-        tagMatch = search(regexTags,line)
-        
-        Otags = []
-        if tagMatch:
-            Ntags = tagMatch.group(1).split(",")
-            for t in enumerate(Ntags):
-                Otags.append("#"+t[1].strip())
-
-            line = "Tags: "+", ".join(Otags)
-    
+        line, cnt = feature_tags_convert(line)
+        tags_cnt += cnt
 
         newLines.append(line)
     
-    return newLines
+
+
+    return newLines, [in_link_cnt, em_link_cnt, bl_link_cnt,tags_cnt]
 
     
     
