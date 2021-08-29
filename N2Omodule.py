@@ -11,6 +11,24 @@ from re import compile, search
 from csv import DictReader
 from pathlib import Path
 
+def notion_mix_decoded_string_convert(string):
+
+    regexSpecialUtf8 = compile("%([A-F0-9][A-F0-9])")
+    encoded_str = []
+
+    while range(len(string)):
+            
+        special_utf8_match = regexSpecialUtf8.search(string[0:3])
+        if (special_utf8_match):
+            code = regexSpecialUtf8.sub("0x"+string[1:3], string[0:3])
+            encoded_str.append(bytes([int(code, 0)]))
+            string = string[3:]
+        else:
+            encoded_str.append(string[0].encode('utf-8'))
+            string = string[1:]
+
+    return b''.join(encoded_str).decode('utf-8')
+
 
 def str_slash_char_remove(string):
 
@@ -116,7 +134,7 @@ def N2Ocsv(csvFile):
         line = line.rstrip()
         #1 Replace URL identifiers and/or symbols with a space
         line = regexURLid.sub(" ",line)
-        line = regexSymbols.sub(" ",line)
+        line = regexSymbols.sub("",line)
          #2 Remove duplicate spaces
         line = regexSpaces.sub(" ", line) 
         #3 Remove any spaces at beginning
@@ -208,35 +226,10 @@ def embedded_link_convert(line):
         relativePath = str_space_utf8_replace(relativePath)
         
         utf8_match = regexutf8.search(relativePath)
-        while utf8_match:
-            is_special_utf8 = False
-            utf8_match = regexutf8.search(relativePath)
-            if utf8_match:
-                byte_1 = "0x" + utf8_match.group(1)
-                byte_2 = "0x" + utf8_match.group(2)
+        if utf8_match:
+            relativePath = notion_mix_decoded_string_convert(relativePath)
 
-                if (byte_1[0:3] == "0xE") and (byte_1[3] in ['1', '2', '3', '4', '5', '6']):
-                    
-                    special_utf8_match = regexSpecialUtf8.search(relativePath)
-                    byte_3 = "0x" + special_utf8_match.group(3)
-                    bytes_unicode = bytes([int(byte_1,0), int(byte_2,0), int(byte_3,0)])
-                    is_special_utf8 = True
-                else:
-                    bytes_unicode = bytes([int(byte_1,0), int(byte_2,0)])
-
-                try:
-                    unicode_str = str(bytes_unicode, 'utf-8')
-                except:
-                    print("ERROR: convert unicode failed")
-                    print(f"   {bytes_unicode} in - {line}")
-                    break
-
-                if is_special_utf8:
-                    relativePath = regexSpecialUtf8.sub(unicode_str, relativePath, 1)
-                else:
-                    relativePath = regexutf8.sub(unicode_str, relativePath, 1)
-
-        line, num_matchs = regexPath.subn("[["+relativePath+"]]", line)
+        line, num_matchs = regexPath.subn("![["+relativePath+"]]", line)
 
         if num_matchs > 1:
             print(f"Warning: {line} replaced {num_matchs} matchs!!")
@@ -260,7 +253,6 @@ def internal_link_convert(line):
     regexRelativePathNotion =   compile("https:\/\/www\.notion\.so")
     regexRelativePathMdCsv  =   compile("(?:\.md|\.csv)")
     regexRelativePathImage  =   compile("(?:\.png|\.jpg|\.gif|\.bmp|\.jpeg|\.svg)")
-    regexSlash =    compile("\/")
 
     num_matchs = 0
     # Identify and group relative paths
@@ -272,7 +264,6 @@ def internal_link_convert(line):
         relativePath = pathMatch.group(2)
         notionMatch  = regexRelativePathNotion.search(relativePath)
         is_md_or_csv = regexRelativePathMdCsv.search(relativePath)
-        is_image = regexRelativePathImage.search(relativePath)
 
         if is_md_or_csv or notionMatch:
             # Replace all matchs 
