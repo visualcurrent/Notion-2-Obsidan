@@ -83,7 +83,7 @@ $ source ~/.venv/n2o/bin/activate
 
 After that (or without it) you can install this module locally by running the following command:
 ```
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 
 ## ImportError: Unable to find tkinter package.
@@ -93,5 +93,3 @@ If you're on MacOS, you can install a python distribution which supports tkinter
 ```
 $ brew install python-tk
 ```
-
-If you're not on MacOS - you can follow
