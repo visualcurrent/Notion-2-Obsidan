@@ -87,7 +87,7 @@ $ pip install -r requirements.txt
 ```
 
 ## ImportError: Unable to find tkinter package.
-Tkinter is a little tricker to install, it requires your python
+Tkinter is a little tricker to install, it requires your python installation to include it natively.
 
 If you're on MacOS, you can install a python distribution which supports tkinter:
 ```
