@@ -41,7 +41,10 @@ regexUID = compile("\s+\w{32}")
 regexForbitCharacter = compile("[<>?:/\|*\"]")
 
 for line in NotionPathRaw:
-    ObsidianPathRaw.append(regexUID.sub("", line))
+    pathLine = regexUID.sub("", line)
+    pathLine = N2Omodule.remove_all_characters_except_alpha_numeric(pathLine)
+    pathLine = N2Omodule.str_space_utf8_replace(pathLine)
+    ObsidianPathRaw.append(pathLine)
 
 
 ### PATHS IN PROPER OS FORM BY PATHLIB ###
@@ -120,6 +123,8 @@ for n in mdIndex:
         ## Make temp destination file path
         new_file_name = mdContent[0].replace('# ', '') + '.md'
         new_file_name = regexForbitCharacter.sub("", new_file_name)
+        new_file_name = N2Omodule.str_space_utf8_replace(new_file_name)
+        new_file_name = N2Omodule.remove_all_characters_except_alpha_numeric(new_file_name)
         newfilepath = tempPath / path.dirname(ObsidianPaths[n]) / new_file_name
         
         # Check if file exists, append if true
