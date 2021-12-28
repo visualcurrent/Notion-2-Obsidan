@@ -10,7 +10,20 @@ from os import path
 from re import compile, search
 from csv import DictReader
 from pathlib import Path
+import re
 
+def remove_all_characters_except_alpha_numeric(string):
+    # Only keep:
+    # Letters a-z, A-Z
+    # Numbers (0-9)
+    # Dots (\.)
+    # Back Slashes (\/)
+    # Forward Slashes (\\)
+    # Non white space (\s)
+    # ^ means other than the provided patterns
+    # need to be substituted by an empty string
+    string = re.sub('[ ](?=[ ])|[^-_,A-Za-z0-9 \.\/\\\]+', '', string)
+    return string
 
 def str_slash_char_remove(string):
 
@@ -30,11 +43,12 @@ def str_forbid_char_remove(string):
     return string
 
 
-# convert %20 to ' '
+# convert %20 or ' ' to '-'
 def str_space_utf8_replace(string):
 
     regex_utf8_space = compile("%20")
-    string = regex_utf8_space.sub(' ', string)
+    string = regex_utf8_space.sub('-', string)
+    string = string.replace(' ', '-')
 
     return string
 
@@ -184,7 +198,7 @@ def embedded_link_convert(line):
 
     # folder style links
     #regexPath =     compile("^\[(.+)\]\(([^\(]*)(?:\.md|\.csv)\)$") # Overlap incase multiple links in same line
-    #regexRelativePathImage  =   compile("(?:\.png|\.jpg|\.gif|\.bmp|\.jpeg|\.svg)")
+    regexRelativePathImage  =   compile("(?:\.png|\.jpg|\.gif|\.bmp|\.jpeg|\.svg)")
 
     regexPath               =   compile("!\[(.*?)\]\((.*?)\)")
     regex20                 =   compile("%20")
@@ -197,7 +211,7 @@ def embedded_link_convert(line):
         # modify paths into local links. just remove UID and convert spaces
         Title = pathMatch.group(1)
         relativePath = pathMatch.group(2)
-        #is_image = regexRelativePathImage.search(relativePath)
+        is_image = regexRelativePathImage.search(relativePath)
 
         regexSpecialUtf8 = compile("%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])")
         regexutf8 =    compile("%([A-F0-9][A-F0-9])%([A-F0-9][A-F0-9])")
@@ -206,7 +220,8 @@ def embedded_link_convert(line):
         relativePath = str_forbid_char_remove(relativePath)
         relativePath = regexUID.sub("", relativePath)
         relativePath = str_space_utf8_replace(relativePath)
-        
+        relativePath = remove_all_characters_except_alpha_numeric(relativePath)
+
         utf8_match = regexutf8.search(relativePath)
         while utf8_match:
             is_special_utf8 = False
@@ -236,7 +251,10 @@ def embedded_link_convert(line):
                 else:
                     relativePath = regexutf8.sub(unicode_str, relativePath, 1)
 
-        line, num_matchs = regexPath.subn("[["+relativePath+"]]", line)
+        if is_image:
+            line, num_matchs = regexPath.subn("!["+relativePath+"](./"+relativePath+")", line)
+        else:
+            line, num_matchs = regexPath.subn("[["+relativePath+"]]", line)
 
         if num_matchs > 1:
             print(f"Warning: {line} replaced {num_matchs} matchs!!")
@@ -287,6 +305,7 @@ def internal_link_convert(line):
                 title = str_space_utf8_replace(title)
                 title = str_forbid_char_remove(title)
                 title = str_slash_char_remove(title)
+                title = remove_all_characters_except_alpha_numeric(title)
 
                 if title != markdownLinkMatch.group(1):
                     print(line)
