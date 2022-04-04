@@ -97,10 +97,12 @@ for n in csvIndex:
             append_write = 'a' # append if already exists
         else:
             append_write = 'w' # make a new file if not
-        
-        # Save CSV internal links as new .md file
-        with open(newfilepath, append_write, encoding='utf-8') as tempFile:
-            [print(line.rstrip(), file=tempFile) for line in mdTitle]
+        try:
+            # Save CSV internal links as new .md file
+            with open(newfilepath, append_write, encoding='utf-8') as tempFile:
+                [print(line.rstrip(), file=tempFile) for line in mdTitle]
+        except Exception as e:
+            print('  !!File Exception!!', new_file_name)
 
 
 num_link = [0, 0, 0, 0]
@@ -127,11 +129,12 @@ for n in mdIndex:
             append_write = 'a' # append if already exists
         else:
             append_write = 'w' # make a new file if not
-        
-        # Save modified content as new .md file
-        with open(newfilepath, append_write, encoding='utf-8') as tempFile:
-            [print(line.rstrip(), file=tempFile) for line in mdContent]
-
+        try:
+            # Save modified content as new .md file
+            with open(newfilepath, append_write, encoding='utf-8') as tempFile:
+                [print(line.rstrip(), file=tempFile) for line in mdContent]
+        except Exception as e:
+            print('  !!File Exception!!', new_file_name)
 
 
 
