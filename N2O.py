@@ -104,6 +104,7 @@ for n in csvIndex:
 
 
 num_link = [0, 0, 0, 0]
+error_filepath = []
 # Process all MD files
 for n in mdIndex:
     
@@ -128,9 +129,13 @@ for n in mdIndex:
         else:
             append_write = 'w' # make a new file if not
         
-        # Save modified content as new .md file
-        with open(newfilepath, append_write, encoding='utf-8') as tempFile:
-            [print(line.rstrip(), file=tempFile) for line in mdContent]
+        try: 
+            # Save modified content as new .md file
+            with open(newfilepath, append_write, encoding='utf-8') as tempFile:
+                [print(line.rstrip(), file=tempFile) for line in mdContent]
+        except FileNotFoundError:
+            print(f"::OnSave:: Possible long file path for windows? {newfilepath}\n")
+            error_filepath.append(newfilepath)
 
 
 
@@ -156,6 +161,10 @@ for n in othersIndex:
             print('  !!File Exception!!',ObsidianPaths[n])
             print(NotionPathRaw[n], file=e)
             print('', file=e)
+            
+
+    
+
 
     
 print(f"\nTotal converted links:")
@@ -163,6 +172,7 @@ print(f"    - Internal links: {num_link[0]}")
 print(f"    - Embedded links: {num_link[1]}")
 print(f"    - Blank links   : {num_link[2]}")
 print(f"    - Number tags   : {num_link[3]}")
+print(f"    - FileException : {len(error_filepath)}")
 
 
 # Save temporary file collection to new zip
